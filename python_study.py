@@ -1,3 +1,4 @@
+from functools import singledispatch
 from types import MethodDescriptorType
 from typing import Any
 
@@ -216,8 +217,8 @@ import keyword
 # do_it = lambda f, *args: f(*args)
 
 
-def x(fun, *ar):
-    return fun(*ar)
+# def x(fun, *ar):
+#     return fun(*ar)
 
 
 # print(x(sum, [1, 2, 3, 4]))
@@ -294,8 +295,8 @@ def x(fun, *ar):
 # print(a.x)
 
 
-class B:
-    pass
+# class B:
+#     pass
 
 
 # 기본적인 상속 때문에 기능을 한다.
@@ -401,17 +402,17 @@ class B:
 # ----------> 오버라이딩
 
 
-class X:
-    def __init__(self) -> None:
-        print("A")
+# class X:
+#     def __init__(self) -> None:
+#         print("A")
 
 
-class Y(X):
-    def __init__(self) -> None:
-        super().__init__()
+# class Y(X):
+#     def __init__(self) -> None:
+#         super().__init__()
 
 
-print(vars(Y))
+# print(vars(Y))
 
 # * Function / Method
 # * 1. class 안에 정의 여부
@@ -430,33 +431,33 @@ print(vars(Y))
 # A.tt(a)
 
 
-class A(object):
-    def __init__(self) -> None:
-        print("A")
+# class A(object):
+#     def __init__(self) -> None:
+#         print("A")
 
 
-class B(A):
-    def __init__(self) -> None:
-        super().__init__()
-        print("B")
+# class B(A):
+#     def __init__(self) -> None:
+#         super().__init__()
+#         print("B")
 
 
-class C(A):
-    def __init__(self) -> None:
-        super().__init__()
-        print("C")
+# class C(A):
+#     def __init__(self) -> None:
+#         super().__init__()
+#         print("C")
 
 
-class D(B, C):
-    def __init__(self) -> None:
-        # B.__init__(self)
-        # C.__init__(self)
-        super().__init__()
-        print("D")
+# class D(B, C):
+#     def __init__(self) -> None:
+#         # B.__init__(self)
+#         # C.__init__(self)
+#         super().__init__()
+#         print("D")
 
 
-D()
-print(D.mro())
+# D()
+# print(D.mro())
 #! [<class '__main__.D'>, <class '__main__.B'>, <class '__main__.C'>, <class '__main__.A'>, <class 'object'>]
 #! D() 를 실행했을 때 mro 순서대로 B 먼저 하는데 B 는 또 A 부터 가야함 -> 'A' 찍음
 #! -> 이제 B 의 print("B") 를 찍어야하는데 스택에 쌓임
@@ -467,3 +468,144 @@ print(D.mro())
 #!    B
 #!    의 순서로 쌓임
 #!    그래서 A C B D 로 찍히는 거임!!!!!!
+
+# x = 1
+# def t():
+#     return x
+
+# t()
+# # t() -> 여기서 1 이 나온다. 왜냐. 함수 안에 없으면 전역(global)에서 찾기 때문에
+
+
+# x = 1
+
+
+# def t():
+#     x = x + 1
+#     return x
+
+# t()
+# ! 이건 불가.
+
+# def t():
+#     global x
+#     x = x + 1
+#     return x
+
+# t()
+# ! -> 얜 가능
+
+
+# class A:
+#     pass
+
+
+# print(globals())
+
+x = 1
+
+
+# def x():
+#     def y():
+#         return 1
+
+#     return y
+
+
+# # * 이중함수 ()() 이렇게 불러올 수 있다.
+# print(x()())
+
+# def x():
+#     def y():
+#         return 1
+
+#     return y()
+
+
+# # * return y() 하면 괄호 두개 안 붙여도 된다.
+# print(x())
+
+t = 1
+
+
+# def x():
+#     t = 2
+
+#     def y():
+#         return t
+
+#     return y()
+
+
+# print(x())
+# * 결과값 2 -> 왜냐면 enclosing 영역에 t의 값이 있기 때문에
+
+
+# def x():
+#     t = 2
+
+#     def y():
+#         nonlocal t
+#         t = t + 1
+#         return t
+
+#     return y()
+
+
+# print(x())
+# * 결과값 3 -> nonlocal 을 쓰면 local 영역에 t가 없더라도 에러가 나는 게 아니라 enclosing 영역에 접근해서 사용된다.
+
+
+# def m(a):
+#     def n(b):
+#         return a + b
+
+#     return n
+
+
+# print(m(3)(4))
+
+
+# class A:
+#     def __init__(self, m) -> None:
+#         self.m = m
+
+#     def __call__(self, n) -> Any:
+#         return self.m + n
+
+
+# print(A(3)(4))
+
+# * ifelse 랑 비슷한 기능
+# @singledispatch
+# def x(a):
+#     print("A")
+
+
+# @x.register(int)
+# def _x(a):
+#     print("int")
+
+
+# @x.register(str)
+# def _x(a):
+#     print("str")
+
+
+# x(3)
+
+
+class A:
+    def __len__(self):
+        print("len을 실행")
+        return 0
+
+    def __getitem__(self, key):
+        print("getitem 실행")
+        return "NO"
+
+
+a = A()
+# print(dir(a))
+print(a[0])
+# print(len(a))
