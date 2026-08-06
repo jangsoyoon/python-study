@@ -319,7 +319,7 @@ class B:
 #     def __call__(self, *args: Any, **kwds: Any) -> Any:
 #         print("B")
 
-#     @staticmethod
+#     @staticmethod  -> 클래스 이름으로 묶인 함수다.
 #     def tt(a, b):
 #         return a + b
 
@@ -420,11 +420,50 @@ print(vars(Y))
 # * 클래스 입장에선 함수 / 인스턴스 입장에서는 method
 
 
-class A:
-    def tt(self):
+# class A:
+#     def tt(self):
+#         print("A")
+
+
+# a = A()
+# a.tt()
+# A.tt(a)
+
+
+class A(object):
+    def __init__(self) -> None:
         print("A")
 
 
-a = A()
-a.tt()
-A.tt(a)
+class B(A):
+    def __init__(self) -> None:
+        super().__init__()
+        print("B")
+
+
+class C(A):
+    def __init__(self) -> None:
+        super().__init__()
+        print("C")
+
+
+class D(B, C):
+    def __init__(self) -> None:
+        # B.__init__(self)
+        # C.__init__(self)
+        super().__init__()
+        print("D")
+
+
+D()
+print(D.mro())
+#! [<class '__main__.D'>, <class '__main__.B'>, <class '__main__.C'>, <class '__main__.A'>, <class 'object'>]
+#! D() 를 실행했을 때 mro 순서대로 B 먼저 하는데 B 는 또 A 부터 가야함 -> 'A' 찍음
+#! -> 이제 B 의 print("B") 를 찍어야하는데 스택에 쌓임
+#! -> super().__init__()은 다음 클래스(MRO 순서상)의 __init__이 완전히 끝날 때까지 현재 함수를 그 자리에서 멈추게 만든다.
+#! 그리고 다시 D() 의 호출로 인해서 C 로 감 A로 또 가서 print('A') 찍혀야하는데
+#! super 의 기능 중 하나가 중복제거임 그래서 A 안 찍힘 그 대신 이제 print("C") 를 찍어야하는데 스택에 쌓임
+#! -> C
+#!    B
+#!    의 순서로 쌓임
+#!    그래서 A C B D 로 찍히는 거임!!!!!!
