@@ -1,4 +1,6 @@
 from functools import singledispatch
+import functools
+from re import I
 from types import MethodDescriptorType
 from typing import Any
 
@@ -595,17 +597,87 @@ t = 1
 # x(3)
 
 
-class A:
-    def __len__(self):
-        print("len을 실행")
-        return 0
+# class A:
+#     def __len__(self):
+#         print("len을 실행")
+#         return 0
 
-    def __getitem__(self, key):
-        print("getitem 실행")
-        return "NO"
+#     def __getitem__(self, key):
+#         print("getitem 실행")
+#         return "NO"
 
 
-a = A()
+# a = A()
 # print(dir(a))
-print(a[0])
+# print(a[0])
 # print(len(a))
+
+from collections.abc import Sequence
+
+# class M(Sequence):
+#     pass
+
+
+# a = M()
+
+# 파이썬에서 상속은 물려받는 개념이 아니다.
+
+################################!COMPOSITION################################
+import builtins
+
+
+# 테크닉 1
+class B:
+    x = 1
+
+    def __init__(self) -> None:
+        self.a = 1
+
+
+class C:
+    x = 1
+
+
+class A:
+    def __init__(self) -> None:
+        self.b = B()
+
+    def __getattr__(self, x):
+        print("aaa")
+
+
+# return 이 없다면 return값이 필요없다거나 아니면 generator
+# def y():
+#     yield 1
+#     yield 2
+#     yield 1
+
+
+# print(type(y()))
+
+#! 리스트는 "Iterable"
+a = [1, 2, 3]
+##! iter 를 해야 __next__ 가 있음
+##! 리스트를 iterator로 변환 . iter()를 거치면 진짜 iterator 객체가 만들어짐
+b = iter(a)
+# print(dir(bb))
+
+# print(next(b))
+# # 메모리에 2,3 남았으
+# print(next(b))
+# # 메모리에 3 남았으
+# print(next(b))
+# #! 이제 없으 -> Error: Stop Iteration -> 예외처리 해줘야함
+# print(next(b))
+
+
+result = map(lambda x: x + 1, [1, 2, 3])
+
+for x in result:
+    print(x)
+result = list(filter(lambda x: x > 1, [0, 1, 2, 3]))
+print(result)
+
+from functools import reduce
+
+print(reduce(lambda x, y: x + y, [1, 2, 3, 4]))
