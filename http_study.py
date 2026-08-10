@@ -504,8 +504,36 @@ dom = BeautifulSoup(resp.text, "html5lib")
 resp = get("https://pythonscraping.com/pages/page3.html")
 dom = BeautifulSoup(resp.text, "html.parser")
 
-print([td.text.strip() for td in dom.select("table tr > td:nth-child(3)")])
+# * table 의 자손 중 tr, tr의 자식 중 3번째 td
+# print([td.text.strip() for td in dom.select("table tr > td:nth-child(3)")])
 
-print([td.attrs["src"] for td in dom.select("table tr > td:nth-child(4) > img")])
+# * table 의 자손 중 tr, tr의 자식 중 4번째 td, td의 자식 중 img
+# print([td.attrs["src"] for td in dom.select("table tr > td:nth-child(4) > img")])
 
-print(dom.select("table *[src$=jpg]"))
+# * table 의 자손 중 속성이 src가 jpg로 끝나는 모든 태그들
+# print(dom.select("table *[src$=jpg]"))
+
+
+url = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=%EC%9B%90%EB%B9%88&ackey=l6o8unya"
+headers = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"
+}
+
+params = dict(parse_qsl(re.search(r"[?](.+)$", url).group(1)))
+
+url = re.search(r"^(.+)[?]", url).group(1)
+# req = Request(new_url, headers=headers, method="GET")
+resp = get(url=url, params=params, headers=headers)
+# print(resp.status_code, resp.reason, resp.headers["content-type"])
+dom = BeautifulSoup(resp.text, "html5lib")
+
+print(
+    dom.select(
+        "div[id^=fdr] > div > div > div > div:first-child div > a[class^=fender-ui]"
+    )[0].text
+)
+print(
+    dom.select(
+        "div[id^=fdr] > div > div > div > div:first-child div > a[class^=fender-ui]"
+    )[0].attrs["href"]
+)
