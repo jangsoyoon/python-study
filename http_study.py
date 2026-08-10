@@ -1,8 +1,11 @@
 from hmac import new
 import json
-from re import ASCII, L
+from os import name
+from re import A, ASCII, L
 from urllib.request import Request, urlopen
 
+import attr
+import re._constants
 from urllib3 import HTTPResponse
 
 # resp = urlopen("https://www.naver.com")
@@ -271,14 +274,238 @@ def download(url, params={}, data={}, method="GET", retries=3):
 # download("https://httpbin.org/status/500")
 
 
-url = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=%EC%9B%90%EB%B9%88&ackey=l5d902h7"
-params = dict(parse_qsl(urlparse(url).query))
+# url = "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=%EC%9B%90%EB%B9%88&ackey=l5d902h7"
+# params = dict(parse_qsl(urlparse(url).query))
 
 from requests.compat import urljoin
 
-print(urljoin(url, "/search.naver"))
+# print(urljoin(url, "/search.naver"))
 
-resp = download(url, params=params)
-# print(re.search("<title>(.+)</title>", resp.text).group(1))
+# resp = download(url, params=params)
+# # print(re.search("<title>(.+)</title>", resp.text).group(1))
 
-print(resp.text)
+# print(resp.text)
+
+from bs4 import BeautifulSoup
+
+# html = """
+# <html>
+# <head></head>
+# <body>
+# <div>
+# <p>
+# <a>go to page</a>
+# </p>
+# </div>
+# </body>
+# </html>
+# """
+
+# html = """
+# <html>
+# <head></head>
+# <body>
+# <div id="result">
+# <p class="row">
+# <a class="red">go to page1</a>
+# <a class="blue">go to page2</a>
+# </p>
+# </div>
+# </body>
+# </html>
+# """
+
+# dom = BeautifulSoup(html, "html.parser")
+# print(type(dom), type(html))
+
+# a = dom.html.body.div.p.a
+
+# print(
+#     dom.a.text, dom.text.strip(), re.sub(r"^\s*|\s*S", "", dom.text)
+# )  # 공백문자0개 이상으로 시작 | 공백문자 0개 이상으로 끝
+
+# print(dom.find_all("a"))
+# print(dom.find(string=re.compile("\d$")))
+# print(dom.find_all(name="a", limit=1)[0])
+
+
+html = html = """
+<html>
+<head><head>
+<div>
+    <ul>
+        <li>
+        <li>
+</div>
+</LI>
+</DiV>
+</html>
+"""
+dom1 = BeautifulSoup(html, "html.parser")  # * 성능 준수함
+
+# print(dom1)
+dom2 = BeautifulSoup(html, "lxml")  # * 빠름
+# print(dom2)
+# print(dom2.li.find_next_sibling())
+dom3 = BeautifulSoup(html, "html5lib")  # * 느림
+# print(dom3)
+# print(dom3.li.find_next_sibling())
+
+
+from requests import get
+
+resp = get("https://pythonscraping.com/pages/page3.html")
+# print(resp.status_code, resp.reason)
+# print(resp.headers["content-type"])
+
+# resp.text => charset decoding str 객체
+# resp.content => bytes 객체
+
+dom = BeautifulSoup(resp.content, "html.parser")
+
+# print(dom.find(attrs={"id": "footer"}))
+
+# print(
+#     [tag.name for tag in dom.div.find_all(recursive=False)]
+# )  # recursive : 자식만 찾겠다
+
+# html.parser/lxml
+# document
+# HTML
+# HEAD            BODY
+# DIV
+# IMG H1 #DIV #TABLE #DIV
+
+dom2 = BeautifulSoup(resp.content, "html5lib")
+# print([tag.name for tag in dom2.head.find_all(recursive=False)])
+
+# html5lib
+# document
+# HTML
+# HEAD            BODY
+# DIV
+# IMG H1 #DIV #TABLE #P #DIV
+
+footer = dom2.find(attrs={"id": "footer"})
+# ... table    p      footer
+#     앞에[-1]   앞에[0]
+# find_previous_siblings()는 결과를 "가까운 순서(역순)"로 리스트에 담아주기 때문에,
+# 문서상 더 앞쪽(더 먼)에 있는 태그를 가져오려면 [0]이 아니라 [-1]을 써야 한다.
+# print(footer.find_previous_siblings(limit=2)[-1])
+# print(footer.find_parent().find_all(name="table", recursive=False))
+# print(footer.find_parent("body").find(attrs={"id": "giftList"}))
+
+# print(
+#     footer.find_parent()
+#     .find(name="table")
+#     .find()
+#     .find_all(recursive=False)[-1]
+#     .find_all(recursive=False)[-2]
+#     .text.strip()
+# )
+
+# print(dom.find_all("td")[-2].text)
+
+# print(dom.find(string=re.compile("1.50")).find_parent().text.strip())
+
+# print(dom.find_all("img")[1:])
+# print(dom.find_all(name="img", attrs={"src": re.compile("[1-6][.]jpg$")}))
+
+# for td in dom.find_all("td"):
+#     if td.find("img") != None:
+#         print(td.find("img"))
+data = []
+for tr in dom.find_all(name="tr"):
+    if len(tr.find_all("td", recursive=False)) > 0:  # th 걸러내기 위해
+        td = tr.find_all("td", recursive=False)[2]
+        data.append(td.text.strip())
+
+
+# print(data)
+
+
+imgs = []
+for tr in dom.find_all(name="tr"):
+    if len(tr.find_all("td", recursive=False)) > 0:  # th 걸러내기 위해
+        td = tr.find_all("td", recursive=False)[3]
+        imgs.append(td.img.attrs["src"])
+
+
+# print(imgs)
+
+
+from requests.compat import urljoin
+
+# print([urljoin(resp.request.url, src) for src in imgs])
+
+
+resp = get("https://pythonscraping.com/img/gifts/img4.jpg")
+# print(resp.status_code, resp.reason, resp.headers)
+
+
+# print(re.search(r"/(img[1-6])\.jpg$", resp.request.url).group(1))
+# print(re.search(r"image/(jpg|jpeg|bmp|png)", resp.headers["content-type"]).group(1))
+
+
+# * 파일 저장
+with open("img4.jpeg", "wb") as fp:
+    fp.write(resp.content)
+
+
+from urllib.parse import parse_qsl
+
+url = "https://search.daum.net/search?w=tot&DA=YZR&t__nil_searchbox=btn&q=%EC%9B%90%EB%B9%88"
+headers = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"
+}
+
+params = dict(parse_qsl(re.search(r"[?](.+)$", url).group(1)))
+
+url = re.search(r"^(.+)[?]", url).group(1)
+# req = Request(new_url, headers=headers, method="GET")
+resp = get(url=url, params=params, headers=headers)
+# print(resp.status_code, resp.reason, resp.headers["content-type"])
+
+dom = BeautifulSoup(resp.text, "html5lib")
+
+# print(dom.title)
+
+# print(len(dom.find_all("c-doc-web")))
+
+# for row in dom.find_all("c-doc-web"):
+#     print(row.find("c-title").text.strip())
+#     print(row.find("c-title").attrs["data-href"])
+
+
+# print(dom.find(name="div", attrs={"id": "fdr-d1a052bd423a40f79324d68b64175dfa"}))
+# result = dom.find_all(name="div", attrs={"id": re.compile(r"^fdr-")})[0]
+# for row in result.find().find().find().find_all(name="div", recursive=False):
+#     link = row.find().find_all(recursive=False)[0]
+#     desc = row.find().find_all(recursive=False)[1]
+#     print(link.a.attrs["href"])
+#     print(desc.find(name="span").text.strip())
+
+
+# * find => DOM 트리에서 특정 한 노드에서의 관계만 갖고 탐색
+# * tag name      => find계열의 함수들에서 name 에 해당되는 부분
+# * # id          => find계열의 함수들에서 attrs={'id':?} 에 해당되는 부분
+# * # .class      => find계열의 함수들에서 attrs={'class':?} 에 해당되는 부분
+# * # c-item      => find계열의 함수들에서 attrs={'c-item':?} 에 해당되는 부분
+
+# * div     #id => 자손
+# * div >   #id => 자식(>)
+
+# * div:has(> a) => find('a').find_parent('div')
+# * 대상: div, 조건: a가 자식인 애
+
+# * div:has(+ a) => find('a').find_previous_sibling()
+# * 대상: div, 조건: 내 다음 형제가 a인 애
+
+resp = get("https://pythonscraping.com/pages/page3.html")
+dom = BeautifulSoup(resp.text, "html.parser")
+
+print([td.text.strip() for td in dom.select("table tr > td:nth-child(3)")])
+
+print([td.attrs["src"] for td in dom.select("table tr > td:nth-child(4) > img")])
+
+print(dom.select("table *[src$=jpg]"))
