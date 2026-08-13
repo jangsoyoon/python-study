@@ -419,64 +419,64 @@ def canFetch(url):
 # con.close()
 # print(f"len(seen), len(URLs): {len(seen), len(URLs)}")
 # print(seen)
-ext = {
-    "javascript": "js",
-    "css": "css",
-    "html": "html",
-    "jpeg": "jpg",
-    "jpg": "jpg",
-    "png": "png",
-    "bmp": "bmp",
-}
+# ext = {
+#     "javascript": "js",
+#     "css": "css",
+#     "html": "html",
+#     "jpeg": "jpg",
+#     "jpg": "jpg",
+#     "png": "png",
+#     "bmp": "bmp",
+# }
 
-URLs = list()
-URLs.append(
-    "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=%EC%9B%90%EB%B9%88&ackey=4djr57o6"
-)
+# URLs = list()
+# URLs.append(
+#     "https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=0&ie=utf8&query=%EC%9B%90%EB%B9%88&ackey=4djr57o6"
+# )
 
-seen = list()
+# seen = list()
 
-while URLs:
-    url = URLs.pop(0)
-    seen.append(url)
+# while URLs:
+#     url = URLs.pop(0)
+#     seen.append(url)
 
-    resp = request(url=url, method="GET")
-    if resp.status_code != 200:
-        if resp.status_code >= 500:
-            URLs.append(url)
-        else:
-            continue
+#     resp = request(url=url, method="GET")
+#     if resp.status_code != 200:
+#         if resp.status_code >= 500:
+#             URLs.append(url)
+#         else:
+#             continue
 
-    fname = re.sub(r"[$?!#]", "", re.search(r".+[/]([^/]+)$", url).group(1))
+#     fname = re.sub(r"[$?!#]", "", re.search(r".+[/]([^/]+)$", url).group(1))
 
-    if re.search("text", resp.headers["content-type"]):
-        fext = ext.get(
-            re.search(r"text/(\w+)", resp.headers["content-type"]).group(1), "txt"
-        )
-        with open(f"./dummy/{fname}.{fext}", "w") as fp:
-            fp.write(resp.text)
+#     if re.search("text", resp.headers["content-type"]):
+#         fext = ext.get(
+#             re.search(r"text/(\w+)", resp.headers["content-type"]).group(1), "txt"
+#         )
+#         with open(f"./dummy/{fname}.{fext}", "w") as fp:
+#             fp.write(resp.text)
 
-        if re.search("text/html", resp.headers["content-type"]):
-            dom = BeautifulSoup(resp.text, "html.parser")
-            links = dom.select("script[src], img[src], link[href]")
+#         if re.search("text/html", resp.headers["content-type"]):
+#             dom = BeautifulSoup(resp.text, "html.parser")
+#             links = dom.select("script[src], img[src], link[href]")
 
-            for link in links:
-                nurl = urljoin(
-                    url,
-                    link.attrs["src"] if link.has_attr("src") else link.attrs["href"],
-                )
-                if re.match("http", nurl) is None or re.match(
-                    "#",
-                    link.attrs["src"] if link.has_attr("src") else link.attrs["href"],
-                ):
-                    continue
+#             for link in links:
+#                 nurl = urljoin(
+#                     url,
+#                     link.attrs["src"] if link.has_attr("src") else link.attrs["href"],
+#                 )
+#                 if re.match("http", nurl) is None or re.match(
+#                     "#",
+#                     link.attrs["src"] if link.has_attr("src") else link.attrs["href"],
+#                 ):
+#                     continue
 
-                if nurl not in seen and nurl not in URLs:
-                    URLs.append(nurl)
-    # if re.search('application', resp.headers['content-type']):
-    if re.search("image", resp.headers["content-type"]):
-        fext = ext.get(
-            re.search(r"image/(\w+)", resp.headers["content-type"]).group(1), "txt"
-        )
-        with open(f"./dummy/{fname[:20]}.{fext}", "wb") as fp:
-            fp.write(resp.content)
+#                 if nurl not in seen and nurl not in URLs:
+#                     URLs.append(nurl)
+#     # if re.search('application', resp.headers['content-type']):
+#     if re.search("image", resp.headers["content-type"]):
+#         fext = ext.get(
+#             re.search(r"image/(\w+)", resp.headers["content-type"]).group(1), "txt"
+#         )
+#         with open(f"./dummy/{fname[:20]}.{fext}", "wb") as fp:
+#             fp.write(resp.content)
