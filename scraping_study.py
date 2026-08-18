@@ -250,13 +250,14 @@ with sqlite3.connect("naver_webtoon.db") as con:
             if "titleList" in data.keys():  # 웹툰 목록
                 with sqlite3.connect("naver_webtoon.db") as con:
                     cur = con.cursor()
-                    for item in data["titleList"]:
+                    for item in data["titleList"][:2]:
                         cur.execute(
                             """
                                             select * from WEBTOON_LIST where titleId=?
                                             """,
                             [item["titleId"]],
                         )
+                        # 웹툰 목록에 있는 각 웹툰들이 DB에 있는지 확인, 만약에 없으면 추가
                         if cur.fetchone() is None:
                             cur.execute(
                                 """
@@ -264,12 +265,16 @@ with sqlite3.connect("naver_webtoon.db") as con:
                                                 """,
                                 [item["titleId"], item["titleName"]],
                             )
+                        # Crawler => HTML => Link Extraction => Normalized NewURL => URL Pool
                         new_url = f"https://comic.naver.com/api/article/list?titleId={item['titleId']}&page=1&sort=DESC"
-                        if new_url not in Seen and new_url not in URLs:
+                        if (
+                            new_url not in Seen and new_url not in URLs
+                        ):  # 특정 웹툰의 회차목록 URI
                             URLs.append(new_url)
                     con.commit()
             if "articleList" in data.keys():  # 회차 목록
                 with sqlite3.connect("naver_webtoon.db") as con:
+                    # 어떤 웹툰인지는 모르고 오로지 회차 목록을 불러오는 곳
                     cur = con.cursor()
                     titleId = dict(parse_qsl(url.split("?")[1]))["titleId"]
                     cur.execute(
@@ -280,7 +285,7 @@ with sqlite3.connect("naver_webtoon.db") as con:
                     )
 
                     FK = cur.fetchone()[0]
-                    for item in data["articleList"]:
+                    for item in data["articleList"][:1]:
                         cur.execute(
                             """
                                         select * from NO_LIST where no=?
@@ -304,6 +309,105 @@ with sqlite3.connect("naver_webtoon.db") as con:
                     con.commit()
         if re.search("text/html", resp.headers["content-type"]):
             dom = BeautifulSoup(resp.text, "html.parser")
+            params = dict(parse_qsl(url.split("?")[1]))
+            titleId = params["titleId"]
+            no = params["no"]
+            # 이미지 찾고
+
+            with sqlite3.connect("naver_webtoon.db") as con:
+                # 어떤 웹툰인지는 모르고 오로지 회차 목록을 불러오는 곳
+                cur = con.cursor()
+                cur.execute(
+                    """
+                            select pk from no_list where fk = (
+                                select pk from webtoon_list where titleId = ? limit 0,1
+                            ) and no = ?
+                            """,
+                    [titleId, no],
+                )
+                FK = cur.fetchone()[0]
+                for img in dom.select("#sectionContWide > img[src]"):
+                    new_url = urljoin(url, img.attrs["src"])
+                    cur.execute(
+                        """
+                                select * from img_list where fk = ? and url = ?
+                                """,
+                        [FK, new_url],
+                    )
+
+                    if cur.fetchone() is None:
+                        cur.execute(
+                            """
+                                        insert into img_list(fk, url, path) values(?,?,"")
+                                        """,
+                            [FK, new_url],
+                        )
+
+                    if new_url not in Seen and new_url not in URLs:
+                        URLs.append(new_url)
+                con.commit()
+        # if re.search("image", resp.headers["content-type"]):
+        #     # 이미지 저장 => PATH, FLAG 업데이트
+        #     for img in dom.select("#sectionContWide > img[src]"):
+        #         no = params["no"]
+        #         new_url = urljoin(url, img.attrs["src"])
+        #         cur.execute(
+        #             """
+        #                     select pk from img_list where fk =
+        #                     (select * from no_list where pk = ?) and url = ?
+        #                     """,
+        #             [no, new_url],
+        #         )
+        #         PK = cur.fetchone()
+        #         if cur.fetchone() is None:
+        #             cur.execute(
+        #                 """
+        #                             update IMG_LIST set path = '' and flag = '' where pk = ?
+        #                             """,
+        #                 [PK],
+        #             )
+
+        #         if new_url not in Seen and new_url not in URLs:
+        #             URLs.append(new_url)
+        #     con.commit()
+
+
+con = sqlite3.connect("naver_webtoon.db")
+headers = {
+    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"
+}
+
+cur = con.cursor()
+
+while True:
+    cur.execute("""
+                select pk, url from img_list where flag == 'N' order by regdate asc limit 0, 10
+                """)
+    URLs = cur.fetchall()
+
+    # 더 이상 수집할 이미지가 없을 때,
+    if len(URLs) == 0:
+        break
+
+    while URLs:
+        pk, url = URLs.pop(0)
+
+        resp = get(url, headers=headers)
+
+        if resp.status_code != 200:
+            continue
+
         if re.search("image", resp.headers["content-type"]):
-            # 저장
-            resp.content
+            fname = re.search(r".+/(.+)$", url).group(1)
+            with open(f"webtoon/{fname}", "wb") as fp:
+                fp.write(resp.content)
+                cur.execute(
+                    """
+                            update img_list set flag = 'Y', path = ?, regdate = CURRENT_TIMESTAMP where pk = ?
+                            """,
+                    [f"webtoon/{fname}", pk],
+                )
+
+                con.commit()
+    break
+con.close()
