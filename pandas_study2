@@ -16,6 +16,8 @@ from tabulate import tabulate
 
 df = pd.read_csv("seoul_drama_spot.csv", encoding="cp949")
 
+df2 = df.copy()
+
 # print(df.columns)
 df.columns = [
     "key",
@@ -28,9 +30,24 @@ df.columns = [
     "strict",
     "dong",
 ]
+
+
+# df['추천 여부'] =
 df_top30 = df.head(30)
-sort = df_top30.sort_values(by="key", ascending=False)
-print(
-    tabulate(sort, headers="keys", tablefmt="grid", stralign="center", showindex=False)
-)
+df_top30["추천여부"] = df["name"].apply(lambda x: "y" if "촬영지" in str(x) else "n")
+df_top30 = df_top30.fillna(0)
+df_top30 = df_top30.replace("대망촬영지", "하하촬영지")
+print(df_top30)
+# sort = df_top30.sort_values(by="key", ascending=False)
+# print(df2.loc[1:10, "검색어"])
+# print(
+#     tabulate(
+#         sort,
+#         headers="keys",
+#         tablefmt="grid",
+#         stralign="center",
+#         colalign=("center",) * len(df.columns),
+#         showindex=False,
+#     )
+# )
 # print(sort)
