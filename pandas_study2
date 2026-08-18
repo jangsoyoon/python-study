@@ -1,0 +1,36 @@
+import pandas as pd
+import io
+from tabulate import tabulate
+
+# df = pd.DataFrame(
+#     [
+#         {"0": "삼성전자", "1": "갤럭시S20", "2": "5000"},
+#         {"0": "현대", "1": "펠리세이드", "2": "1000"},
+#         {"0": "네이버", "1": "네이버페이", "2": "500"},
+#     ]
+# )
+
+# df.columns = ["광고주", "브랜드", "집행금액"]
+
+# print(df)
+
+df = pd.read_csv("seoul_drama_spot.csv", encoding="cp949")
+
+# print(df.columns)
+df.columns = [
+    "key",
+    "sort1",
+    "sort2",
+    "sort3",
+    "search-key",
+    "name",
+    "city",
+    "strict",
+    "dong",
+]
+df_top30 = df.head(30)
+sort = df_top30.sort_values(by="key", ascending=False)
+print(
+    tabulate(sort, headers="keys", tablefmt="grid", stralign="center", showindex=False)
+)
+# print(sort)
