@@ -14,30 +14,30 @@ from tabulate import tabulate
 
 # print(df)
 
-df = pd.read_csv("seoul_drama_spot.csv", encoding="cp949")
+# df = pd.read_csv("seoul_drama_spot.csv", encoding="cp949")
 
-df2 = df.copy()
+# df2 = df.copy()
 
-# print(df.columns)
-df.columns = [
-    "key",
-    "sort1",
-    "sort2",
-    "sort3",
-    "search-key",
-    "name",
-    "city",
-    "strict",
-    "dong",
-]
+# # print(df.columns)
+# df.columns = [
+#     "key",
+#     "sort1",
+#     "sort2",
+#     "sort3",
+#     "search-key",
+#     "name",
+#     "city",
+#     "strict",
+#     "dong",
+# ]
 
 
-# df['추천 여부'] =
-df_top30 = df.head(30)
-df_top30["추천여부"] = df["name"].apply(lambda x: "y" if "촬영지" in str(x) else "n")
-df_top30 = df_top30.fillna(0)
-df_top30 = df_top30.replace("대망촬영지", "하하촬영지")
-print(df_top30)
+# # df['추천 여부'] =
+# df_top30 = df.head(30)
+# df_top30["추천여부"] = df["name"].apply(lambda x: "y" if "촬영지" in str(x) else "n")
+# df_top30 = df_top30.fillna(0)
+# df_top30 = df_top30.replace("대망촬영지", "하하촬영지")
+# print(df_top30)
 # sort = df_top30.sort_values(by="key", ascending=False)
 # print(df2.loc[1:10, "검색어"])
 # print(
@@ -51,3 +51,8 @@ print(df_top30)
 #     )
 # )
 # print(sort)
+
+df = pd.read_csv(
+    "서울특별시 서대문구_도시공원 이용자수 현황_20201130.csv", encoding="cp949"
+)
+print(df)
