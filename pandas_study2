@@ -14,7 +14,7 @@ from tabulate import tabulate
 
 # print(df)
 
-# df = pd.read_csv("seoul_drama_spot.csv", encoding="cp949")
+# df = pd.read_csv("/csv/seoul_drama_spot.csv", encoding="cp949")
 
 # df2 = df.copy()
 
@@ -53,6 +53,6 @@ from tabulate import tabulate
 # print(sort)
 
 df = pd.read_csv(
-    "서울특별시 서대문구_도시공원 이용자수 현황_20201130.csv", encoding="cp949"
+    "./csv/서울특별시 서대문구_도시공원 이용자수 현황_20201130.csv", encoding="cp949"
 )
 print(df)

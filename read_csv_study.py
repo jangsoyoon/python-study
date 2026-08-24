@@ -1,7 +1,7 @@
 import pandas as pd
 
 df = pd.read_csv(
-    "서울특별시 서대문구_도시공원 이용자수 현황_20201130.csv", encoding="cp949"
+    "./csv/서울특별시 서대문구_도시공원 이용자수 현황_20201130.csv", encoding="cp949"
 )
 
 # print(df.columns.str.strip())
