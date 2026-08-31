@@ -435,3 +435,7 @@ uniq = [ht.B() for ht in heaps1_text]
 plt.plot(length, uniq, c="k")
 plt.plot(length, list(map(heaps_law, uniq)), c="r")
 plt.show()
+
+####### FeatureExtraction #######
+# 텍스트데이터 -> 자연어처리 -> Tokens(OOV) -> Vector -> Model
+# Zipf, Heaps의 법칙//Tokenizer      Vectorize
