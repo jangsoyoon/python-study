@@ -395,15 +395,26 @@ token_list2 = []
 # print(total_tokens.most_common()[109 : 109 + 620 + 1])
 
 # ! Zipf : 고빈도 + 저빈도 보다 < 중빈도가 더 중요하다
-# ! 고빈도 : 전체 유니크한 토큰들 중 약 2% 내인데, 전체의 50% 를 차지함
-# ! 저빈도 : 약 1~2번정도, 문서의 특징을 온전히 담기가 힘듦
-# ! (수식)TF-IDF(변형) => Okapi => BM25(Agent Hybrid Search)
+# ! 고빈도 : 전체 유니크한 토큰들 중 약 2% 내인데, 빈도는 전체의 50% 를 차지함
+# ! 저빈도 : 큰 데이터셋에서 겨우 약 1~2번정도, 전체 토큰의 50% 차지. 문서의 특징을 온전히 담기가 힘듦
+# ! ==> (수식)TF-IDF(변형)(Weighting 가중치 기법) => Okapi => BM25(Agent Hybrid Search)
+# ! ==> VectorSpace 어느 한 Dim에서의 값(a-가중치 > b-가중치)
 
 # * Heaps; 문서의 길이와 문서 내 유니크한 토큰들 사이에는 특별한 함수 모양의 상관관계(점진적으로 증가)
+# *        문서의 길이에 따라서 구별되는 용어(유니크한 토큰들)들 사이에 함수 형태(k*X^beta)상관관계
+# *        문서가 수집되면 수집될수록, 유니크한 토큰들 계속해서 증가함(예측 - Feature 후보)
+# *        문서의 길이가 길수록, 유니크한 단어도 늘어남(OOV)
 # * - 1. 문서가 충분히 크다면, 대부분의 어휘들이 토큰에 포함됨 -> 데이터가 충분히 커야함
 # * - 2. 시간이 지남에 따라 기계가 모르는(토큰에 포함되지 X) 단어들이 계속 생김 -> Out Of Vocabulary(OOV)
-
 # * 문서의 길이가 점진적으로 커져야 함 -> 유니크한 토큰들 추출
+
+# * [Tokenizer]
+# * sent_tokenize => 문서를 구성하는 가장 작은 단위 = 1문단 = 1문장 => 의미를 담고 있는 최소한의 단위
+# * word_tokenize => 구두점(.,!?) + 띄어쓰기를 기반으로 어절을 분리
+# * regex_tokenize => 정규식(시스템로그)
+# * TweetTokenize => 감정분석
+# * pos_tag => UPENN 품사표를 활용한 영어 형태소 분석기
+# * Komoran => 한글 형태소 분석기(Kkma, Hannanum, Okt, MeCab)
 # heaps1 = [""]
 # # [0:'']
 # for line in sent_tokenize(gutenberg.open(gutenberg.fileids()[0]).read()):
