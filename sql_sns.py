@@ -4,7 +4,7 @@
 
 import sqlite3
 
-con = sqlite3.connect("sns.db")  # Create and database
+con = sqlite3.connect("db/sql/sns.db")  # Create and database
 print(type(con))
 
 # 2. cursor 객체 생성

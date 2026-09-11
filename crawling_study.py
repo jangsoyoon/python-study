@@ -20,7 +20,7 @@ import sqlite3
 #                                      없으면 URL List
 import sqlite3
 
-con = sqlite3.connect("robots.db")
+con = sqlite3.connect("db/crawling/robots.db")
 # cur = con.cursor()
 
 # url = "https://google.com/robots.txt"
@@ -60,7 +60,7 @@ con = sqlite3.connect("robots.db")
 
 # con.commit()
 # con.close()
-# with sqlite3.connect("robots.db") as con:
+# with sqlite3.connect("db/crawling/robots.db") as con:
 #     cur = con.cursor()
 #     cur.execute("SELECT PK FROM HOST WHERE DOMAIN=?", [urlparse(url).netloc])
 #     FK = cur.fetchone()
@@ -97,7 +97,7 @@ def canFetch(url):
             r"^Disallow:\s*(.+)$", resp.text, re.IGNORECASE | re.MULTILINE
         )
 
-        with sqlite3.connect("robots.db") as con:
+        with sqlite3.connect("db/crawling/robots.db") as con:
             cur = con.cursor()
             cur.execute("SELECT PK FROM HOST WHERE DOMAIN=?", [components.netloc])
             FK = cur.fetchone()
@@ -255,7 +255,7 @@ def canFetch(url):
 #             title = dom.select_one("h2#title_area")
 #             content = dom.select_one("article#dic_area")
 #             with open(
-#                 r"./news/" + re.search(r"(\d{8,})$", url).group(1) + ".txt", "w"
+#                 r"./data/news/" + re.search(r"(\d{8,})$", url).group(1) + ".txt", "w"
 #             ) as fp:
 #                 fp.write(title.text.strip())
 #                 fp.write("\n\n\n\n\n")
@@ -283,7 +283,7 @@ def canFetch(url):
 # print(urljoin(url, [a.attrs["href"] for a in dom.select("a.sa_text_title[href]")]))
 # urljoin(url, [a.attrs['href'] for a in dom.select("a.sa_text_title[href]")])
 
-# con = sqlite3.connect("news.db")
+# con = sqlite3.connect("db/nlp/news.db")
 # cur = con.cursor()
 
 # cur.executescript("""
@@ -351,7 +351,7 @@ def canFetch(url):
 #     # Response.body => DOM 변환
 #     if re.search("text/html", resp.headers.get("content-type", "")):
 #         dom = BeautifulSoup(resp.text, "html.parser")
-#         with sqlite3.connect("news.db") as con:
+#         with sqlite3.connect("db/nlp/news.db") as con:
 #             cur = con.cursor()
 #             cur.execute(
 #                 """
@@ -386,13 +386,13 @@ def canFetch(url):
 #             title = dom.select_one("h2#title_area")
 #             content = dom.select_one("article#dic_area")
 #             # with open(
-#             #     r"./news/" + re.search(r"(\d{8,})$", url).group(1) + ".txt", "w"
+#             #     r"./data/news/" + re.search(r"(\d{8,})$", url).group(1) + ".txt", "w"
 #             # ) as fp:
 #             #     fp.write(title.text.strip())
 #             #     fp.write("\n\n\n\n\n")
 #             #     fp.write(content.text.strip())
 
-#             with sqlite3.connect("news.db") as con:
+#             with sqlite3.connect("db/nlp/news.db") as con:
 #                 cur = con.cursor()
 #                 cur.execute(
 #                     """
@@ -453,7 +453,7 @@ def canFetch(url):
 #         fext = ext.get(
 #             re.search(r"text/(\w+)", resp.headers["content-type"]).group(1), "txt"
 #         )
-#         with open(f"./dummy/{fname}.{fext}", "w") as fp:
+#         with open(f"./data/dummy/{fname}.{fext}", "w") as fp:
 #             fp.write(resp.text)
 
 #         if re.search("text/html", resp.headers["content-type"]):
@@ -478,5 +478,5 @@ def canFetch(url):
 #         fext = ext.get(
 #             re.search(r"image/(\w+)", resp.headers["content-type"]).group(1), "txt"
 #         )
-#         with open(f"./dummy/{fname[:20]}.{fext}", "wb") as fp:
+#         with open(f"./data/dummy/{fname[:20]}.{fext}", "wb") as fp:
 #             fp.write(resp.content)

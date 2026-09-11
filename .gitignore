@@ -1,1 +1,3 @@
 .venv/
+spammodel/spam_model.joblib
+db/spammodel.db

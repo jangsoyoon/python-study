@@ -1,0 +1,29 @@
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import CategoricalNB, ComplementNB, BernoulliNB, GaussianNB
+
+# from sklearn.naive_bayes import CategoricalNB, ComplementNB, BernoulliNB # 이 모델 쓰는 거 안 좋다
+from sklearn.ensemble import VotingClassifier
+
+data = load_iris(as_frame=True)
+iris = data.frame
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(iris.iloc[:, :-1], iris.target)
+
+vc = VotingClassifier(
+    [("G", GaussianNB()), ("C", ComplementNB()), ("B", BernoulliNB())],
+    weights=[
+        1,
+        1,
+        1,
+    ],
+)
+vc.fit(X_train, y_train)
+# estimator = Algorithm c.f) model > data + Algorithm
+print(vc.predict(X_test) == y_test)
+import inspect
+
+print(inspect.getsource(VotingClassifier))
+
+results = []

@@ -202,7 +202,7 @@ resp = get(url)
 #             )
 import sqlite3
 
-with sqlite3.connect("naver_webtoon.db") as con:
+with sqlite3.connect("db/scraping/naver_webtoon.db") as con:
     cur = con.cursor()
     # cur.executescript("""
     #                   CREATE TABLE IF NOT EXISTS WEBTOON_LIST(
@@ -248,7 +248,7 @@ with sqlite3.connect("naver_webtoon.db") as con:
         if re.search("application/json", resp.headers["content-type"]):
             data = resp.json()
             if "titleList" in data.keys():  # 웹툰 목록
-                with sqlite3.connect("naver_webtoon.db") as con:
+                with sqlite3.connect("db/scraping/naver_webtoon.db") as con:
                     cur = con.cursor()
                     for item in data["titleList"][:2]:
                         cur.execute(
@@ -273,7 +273,7 @@ with sqlite3.connect("naver_webtoon.db") as con:
                             URLs.append(new_url)
                     con.commit()
             if "articleList" in data.keys():  # 회차 목록
-                with sqlite3.connect("naver_webtoon.db") as con:
+                with sqlite3.connect("db/scraping/naver_webtoon.db") as con:
                     # 어떤 웹툰인지는 모르고 오로지 회차 목록을 불러오는 곳
                     cur = con.cursor()
                     titleId = dict(parse_qsl(url.split("?")[1]))["titleId"]
@@ -314,7 +314,7 @@ with sqlite3.connect("naver_webtoon.db") as con:
             no = params["no"]
             # 이미지 찾고
 
-            with sqlite3.connect("naver_webtoon.db") as con:
+            with sqlite3.connect("db/scraping/naver_webtoon.db") as con:
                 # 어떤 웹툰인지는 모르고 오로지 회차 목록을 불러오는 곳
                 cur = con.cursor()
                 cur.execute(
@@ -372,7 +372,7 @@ with sqlite3.connect("naver_webtoon.db") as con:
         #     con.commit()
 
 
-con = sqlite3.connect("naver_webtoon.db")
+con = sqlite3.connect("db/scraping/naver_webtoon.db")
 headers = {
     "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Safari/537.36"
 }
@@ -399,13 +399,13 @@ while True:
 
         if re.search("image", resp.headers["content-type"]):
             fname = re.search(r".+/(.+)$", url).group(1)
-            with open(f"webtoon/{fname}", "wb") as fp:
+            with open(f"data/webtoon/{fname}", "wb") as fp:
                 fp.write(resp.content)
                 cur.execute(
                     """
                             update img_list set flag = 'Y', path = ?, regdate = CURRENT_TIMESTAMP where pk = ?
                             """,
-                    [f"webtoon/{fname}", pk],
+                    [f"data/webtoon/{fname}", pk],
                 )
 
                 con.commit()

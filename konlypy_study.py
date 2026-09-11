@@ -317,7 +317,7 @@ token_list2 = []
 
 def fileids(pk=None, fk=None):
     newslist = []
-    with sqlite3.connect("news.db") as con:
+    with sqlite3.connect("db/nlp/news.db") as con:
         cur = con.cursor()
         cur.execute("""
                     select pk from news
@@ -330,7 +330,7 @@ def fileids(pk=None, fk=None):
 news = []
 
 for pk in fileids():
-    with sqlite3.connect("news.db") as con:
+    with sqlite3.connect("db/nlp/news.db") as con:
         cur = con.cursor()
         cur.execute(
             """select title, content

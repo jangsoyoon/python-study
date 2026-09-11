@@ -61,7 +61,7 @@ plt.rcParams["font.family"] = "AppleGothic"
 plt.rcParams["axes.unicode_minus"] = False
 
 df = pd.read_csv(
-    "./csv/서울특별시 서대문구_도시공원 이용자수 현황_20201130.csv", encoding="cp949"
+    "./data/csv/서울특별시 서대문구_도시공원 이용자수 현황_20201130.csv", encoding="cp949"
 )
 df["이용자수(명)"] = df["이용자수(명)"].astype(str).str.replace(",", "").astype(int)
 
@@ -74,7 +74,7 @@ fig.set_facecolor("white")
 ax.set_facecolor("white")
 
 # 1. 배경 이미지를 먼저 깔기
-park_img = mpimg.imread("park.png")
+park_img = mpimg.imread("data/park.png")
 ax.imshow(
     park_img,
     extent=[-0.5, len(month) - 0.5, 0, max(users) * 1.15],

@@ -42,7 +42,7 @@ from html import escape, unescape
 # result = unescape(resp.read().decode())
 # print(result)
 
-# with open("원빈.html", "w") as f:
+# with open("data/원빈.html", "w") as f:
 #     f.write(unescape(resp.read().decode()))
 
 
@@ -53,7 +53,7 @@ from html import escape, unescape
 # result = unescape(resp.read().decode())
 # print(result)
 
-# with open("원빈.html", "w") as f:
+# with open("data/원빈.html", "w") as f:
 #     f.write(unescape(resp.read().decode()))
 
 
@@ -448,7 +448,7 @@ resp = get("https://pythonscraping.com/img/gifts/img4.jpg")
 
 
 # * 파일 저장
-with open("img4.jpeg", "wb") as fp:
+with open("data/img4.jpeg", "wb") as fp:
     fp.write(resp.content)
 
 

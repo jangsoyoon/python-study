@@ -5,7 +5,7 @@ from tarfile import data_filter
 # connect() - close() 이 한 쌍
 # connect -> File Open -> close
 # con = sqlite3.connect(':memory:')  # Create an in-memory database
-con = sqlite3.connect("test.db")  # Create and atabase
+con = sqlite3.connect("db/sql/test.db")  # Create and atabase
 # print(help(sqlite3.connect))
 # print(type(con))
 

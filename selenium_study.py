@@ -154,7 +154,7 @@ from requests.compat import urljoin
 
 import json
 
-with open("naver.json", "r", encoding="utf8") as fp:
+with open("data/naver.json", "r", encoding="utf8") as fp:
     naver = json.load(fp)
     #     print(naver)
 
